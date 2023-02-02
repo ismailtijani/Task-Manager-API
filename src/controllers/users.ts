@@ -1,5 +1,4 @@
 import { Response, RequestHandler } from "express";
-import { UserInfo } from "os";
 import Logging from "../library/loggings";
 import AppError from "../library/service";
 import { responseStatusCodes, IUser, IUserModel } from "../library/types";
@@ -50,37 +49,37 @@ class controller {
   };
 
   public updateUser: RequestHandler = async (req, res, next) => {
-    const updates = Object.keys(req.body) as Array<Partial<keyof IUserModel>>;
-    if (updates.length === 0 || !req.user) return;
-    const allowedUpdates = ["name", "password", "email", "age"];
-    const isValidOperation = updates.every((update) =>
-      allowedUpdates.includes(update)
-    );
-    if (!isValidOperation)
-      throw new AppError({
-        message: "Invalid Updates!",
-        statusCode: responseStatusCodes.UNPROCESSABLE,
+    try {
+      const updates = Object.keys(req.body) as Array<Partial<keyof IUserModel>>;
+      if (updates.length === 0 || !req.user)
+        throw new AppError({
+          message: "Invalid Update",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const allowedUpdates = ["name", "password", "email", "age"];
+      const isValidOperation = updates.every((update) =>
+        allowedUpdates.includes(update)
+      );
+      if (!isValidOperation)
+        throw new AppError({
+          message: "Invalid Updates!",
+          statusCode: responseStatusCodes.UNPROCESSABLE,
+        });
+      const user: any = req.user;
+
+      updates.forEach((update) => {
+        user[update] = req.body[update];
       });
 
-    let updateUser: Partial<IUser> = {};
-
-    updates.forEach((update) => {
-      updateUser[update as keyof typeof updateUser] = req.body[update];
-    });
-
-    try {
-      const findUser = await User.findOne({ _id: req.user._id });
-      findUser.name = updateUser.name;
-      const updatedUser = await User.updateOne(
-        updateUser,
-        { _id: req.user?._id },
-        { new: true }
-      );
-
-      res.status(200).send(updatedUser);
+      res.status(200).send(user);
     } catch (error) {
-      next();
+      next(error);
     }
+  };
+
+  public deleteUser: RequestHandler = async (req, res, next) => {
+    try {
+    } catch (error) {}
   };
 }
 
