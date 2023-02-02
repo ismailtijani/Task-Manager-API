@@ -49,28 +49,28 @@ class controller {
   };
 
   public updateUser: RequestHandler = async (req, res, next) => {
+    const updates = Object.keys(req.body) as Array<Partial<keyof IUserModel>>;
+    if (updates.length === 0)
+      throw new AppError({
+        message: "Invalid Update",
+        statusCode: responseStatusCodes.BAD_REQUEST,
+      });
+    const allowedUpdates = ["name", "password", "email", "age"];
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
+    if (!isValidOperation)
+      throw new AppError({
+        message: "Invalid Updates!",
+        statusCode: responseStatusCodes.UNPROCESSABLE,
+      });
     try {
-      const updates = Object.keys(req.body) as Array<Partial<keyof IUserModel>>;
-      if (updates.length === 0 || !req.user)
-        throw new AppError({
-          message: "Invalid Update",
-          statusCode: responseStatusCodes.BAD_REQUEST,
-        });
-      const allowedUpdates = ["name", "password", "email", "age"];
-      const isValidOperation = updates.every((update) =>
-        allowedUpdates.includes(update)
-      );
-      if (!isValidOperation)
-        throw new AppError({
-          message: "Invalid Updates!",
-          statusCode: responseStatusCodes.UNPROCESSABLE,
-        });
-      const user: any = req.user;
+      const user: any = req.user!;
 
       updates.forEach((update) => {
         user[update] = req.body[update];
       });
-
+      await user.save();
       res.status(200).send(user);
     } catch (error) {
       next(error);
@@ -79,7 +79,11 @@ class controller {
 
   public deleteUser: RequestHandler = async (req, res, next) => {
     try {
-    } catch (error) {}
+      await req.user?.delete();
+      res.send(req.user);
+    } catch (error) {
+      next(error);
+    }
   };
 }
 

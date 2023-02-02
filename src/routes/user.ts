@@ -25,6 +25,7 @@ class UserRoutes {
     );
     this.router.get("/profile", auth, userController.readUser);
     this.router.patch("/update", auth, userController.updateUser);
+    this.router.delete("/delete", auth, userController.deleteUser);
   }
 }
 
