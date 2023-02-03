@@ -2,6 +2,7 @@ import { Router, Application } from "express";
 import Controller from "../controllers/task";
 import joiSchema from "../library/schema";
 import validator from "../middleware/validator";
+import auth from "../middleware/auth";
 
 export class TaskRoutes {
   public router: Router;
@@ -24,6 +25,11 @@ export class TaskRoutes {
       "/:id",
       validator(joiSchema.findTaskById, "params"),
       this.TaskController.getTaskById
+    );
+    this.router.patch(
+      "/update",
+      validator(joiSchema.creatTask, "body"),
+      this.TaskController.updateTask
     );
   }
 }

@@ -7,12 +7,7 @@ import Task from "../models/task";
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {
     try {
-      const { task, completed } = req.body as {
-        task: string;
-        completed: boolean | undefined;
-      };
-      Logging.info(completed);
-      const newTask = await Task.create({ task, completed });
+      const newTask = await Task.create(req.body);
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "Task Created successfully",
@@ -59,6 +54,7 @@ class Controller {
       next(error);
     }
   };
+  public updateTask: RequestHandler = (req, res, next) => {};
 }
 
 export default Controller;
