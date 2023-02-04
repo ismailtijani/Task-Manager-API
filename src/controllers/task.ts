@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import Logging from "../library/loggings";
 import AppError from "../library/service";
-import { responseStatusCodes } from "../library/types";
+import { IUserModel, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
+import User from "../models/user";
 
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {
@@ -38,7 +39,10 @@ class Controller {
 
   public getTaskById: RequestHandler = async (req, res, next) => {
     try {
-      const task = await Task.findOne({ _id: req.params.id });
+      const task = await Task.findOne({
+        _id: req.params.id,
+        owner: req.user?._id,
+      });
       if (!task)
         throw new AppError({
           message: "Task does not exist",
@@ -54,7 +58,35 @@ class Controller {
       next(error);
     }
   };
-  public updateTask: RequestHandler = (req, res, next) => {};
+  public updateTask: RequestHandler = async (req, res, next) => {
+    try {
+      const updates = Object.keys(req.body);
+      if (updates.length === 0)
+        throw new AppError({
+          message: "Invalid Update",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const allowedUpdated = ["task", "completed"];
+      const isValidOperation = updates.every((update) =>
+        allowedUpdated.includes(update)
+      );
+      if (!isValidOperation)
+        throw new AppError({
+          message: "Invalid Updates",
+          statusCode: responseStatusCodes.UNPROCESSABLE,
+        });
+
+      const task: any = await Task.findById({
+        _id: req.params.id,
+        owner: req.user?._id,
+      });
+      updates.forEach((update) => (task[update] = req.body[update]));
+      await task.save();
+      res.status(200).send(task);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default Controller;

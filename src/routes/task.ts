@@ -18,17 +18,20 @@ export class TaskRoutes {
     this.router.post(
       "/",
       validator(joiSchema.creatTask, "body"),
+      auth,
       this.TaskController.createTask
     );
-    this.router.get("/", this.TaskController.getTasks);
+    this.router.get("/", auth, this.TaskController.getTasks);
     this.router.get(
       "/:id",
       validator(joiSchema.findTaskById, "params"),
+      auth,
       this.TaskController.getTaskById
     );
     this.router.patch(
-      "/update",
-      validator(joiSchema.creatTask, "body"),
+      "/update/:id",
+      validator(joiSchema.updateTask, "body"),
+      auth,
       this.TaskController.updateTask
     );
   }
