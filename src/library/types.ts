@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Document, Model } from "mongoose";
+import { Document, Model, Types } from "mongoose";
 export enum responseStatusCodes {
   SUCCESS = 200,
   CREATED = 201,
@@ -45,6 +45,7 @@ export interface LoginModel extends Model<IUserModel> {
 export interface ITask {
   task: string;
   completed?: boolean;
+  owner: Types.ObjectId;
 }
 
 export interface AppErrorArgs {

@@ -7,7 +7,7 @@ import Task from "../models/task";
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {
     try {
-      const newTask = await Task.create(req.body);
+      const newTask = await Task.create({ ...req.body, owner: req.user?._id });
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "Task Created successfully",
