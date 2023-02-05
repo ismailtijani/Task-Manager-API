@@ -67,7 +67,7 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-// User and Task relationship
+// User and Task relationship (to enable populate)
 userSchema.virtual("tasks", {
   ref: "Task",
   localField: "_id",
