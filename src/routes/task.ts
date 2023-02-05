@@ -34,6 +34,12 @@ export class TaskRoutes {
       auth,
       this.TaskController.updateTask
     );
+    this.router.delete(
+      "/delete/:id",
+      validator(joiSchema.findTaskById, "params"),
+      auth,
+      this.TaskController.deleteTask
+    );
   }
 }
 

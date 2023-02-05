@@ -59,30 +59,51 @@ class Controller {
     }
   };
   public updateTask: RequestHandler = async (req, res, next) => {
+    const updates = Object.keys(req.body);
+    if (updates.length === 0)
+      throw new AppError({
+        message: "Invalid Update",
+        statusCode: responseStatusCodes.BAD_REQUEST,
+      });
+    const allowedUpdated = ["task", "completed"];
+    const isValidOperation = updates.every((update) =>
+      allowedUpdated.includes(update)
+    );
+    if (!isValidOperation)
+      throw new AppError({
+        message: "Invalid Updates",
+        statusCode: responseStatusCodes.UNPROCESSABLE,
+      });
     try {
-      const updates = Object.keys(req.body);
-      if (updates.length === 0)
-        throw new AppError({
-          message: "Invalid Update",
-          statusCode: responseStatusCodes.BAD_REQUEST,
-        });
-      const allowedUpdated = ["task", "completed"];
-      const isValidOperation = updates.every((update) =>
-        allowedUpdated.includes(update)
-      );
-      if (!isValidOperation)
-        throw new AppError({
-          message: "Invalid Updates",
-          statusCode: responseStatusCodes.UNPROCESSABLE,
-        });
-
       const task: any = await Task.findById({
         _id: req.params.id,
         owner: req.user?._id,
       });
+      if (!task)
+        throw new AppError({
+          message: "Invalid Update",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+
       updates.forEach((update) => (task[update] = req.body[update]));
       await task.save();
       res.status(200).send(task);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public deleteTask: RequestHandler = async (req, res, next) => {
+    try {
+      const task = await Task.findOneAndDelete({
+        _id: req.params.id,
+        owner: req.user?._id,
+      });
+      if (!task)
+        throw new AppError({
+          message: "Invalid Request",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      res.status(200).json(task);
     } catch (error) {
       next(error);
     }
