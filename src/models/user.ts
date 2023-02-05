@@ -67,6 +67,13 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
+// User and Task relationship
+userSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
+
 // User Token Generation
 userSchema.methods.generateAuthToken = async function () {
   const user = this as IUserModel;
