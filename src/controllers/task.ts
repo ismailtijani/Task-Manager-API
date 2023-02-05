@@ -1,7 +1,8 @@
 import { RequestHandler } from "express";
 import Logging from "../library/loggings";
+
 import AppError from "../library/service";
-import { IUserModel, responseStatusCodes } from "../library/types";
+import { ITask, IUserModel, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
 import User from "../models/user";
 
@@ -19,10 +20,14 @@ class Controller {
     }
   };
 
+  //GET /tasks?completed=true
+  //GET /tasks?limit=2&skip=2
+  //GET /tasks?sortBy=createBy:desc or /tasks?sortBy=completed_asc
   public getTasks: RequestHandler = async (req, res, next) => {
     try {
-      const task = await Task.find({}); //Type for task
-      if (task.length === 0)
+      await req.user?.populate("tasks");
+      const tasks = req.user?.tasks as ITask[];
+      if (tasks.length === 0)
         throw new AppError({
           message: "No task found",
           statusCode: responseStatusCodes.NOT_FOUND,
@@ -30,7 +35,7 @@ class Controller {
       res.status(200).json({
         STATUS: "SUCCESS",
         MASSAGE: "Task retrieved",
-        TASKS: task,
+        TASKS: tasks,
       });
     } catch (error) {
       next(error);

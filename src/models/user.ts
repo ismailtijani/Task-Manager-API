@@ -1,15 +1,16 @@
 import bcrypt from "bcrypt";
-
 import { Schema, model } from "mongoose";
 import validator from "validator";
 import AppError from "../library/service";
 import jwt from "jsonwebtoken";
+import Task from "./task";
 import {
   IUser,
   IUserModel,
   responseStatusCodes,
   LoginModel,
 } from "../library/types";
+import Logging from "../library/loggings";
 
 const userSchema = new Schema<IUser>(
   {
@@ -112,6 +113,17 @@ userSchema.pre("save", async function (next) {
   if (user.isModified("password")) {
     user.password = await bcrypt.hash(user.password, 8);
   }
+  next();
+});
+
+//Deleting User's Task upon Deleting User Profile
+userSchema.pre<IUserModel>("remove", async function (next) {
+  const user = this;
+  // const user = this as unknown as IUserModel; // Why is 'this' having different type
+  await Task.deleteMany({ owner: user._id });
+  Logging.warn(
+    `All tasks created by ${user.name} has been deleted as the user deleted thier account`
+  );
   next();
 });
 
