@@ -6,6 +6,15 @@ import { ITask, IUserModel, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
 import User from "../models/user";
 
+interface IMatch {
+  completed: boolean;
+}
+
+type ISort = {
+  createdAt?: string;
+  completed?: string;
+};
+
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {
     try {
@@ -22,10 +31,25 @@ class Controller {
 
   //GET /tasks?completed=true
   //GET /tasks?limit=2&skip=2
-  //GET /tasks?sortBy=createBy:desc or /tasks?sortBy=completed_asc
+  //GET /tasks?sortBy=createdAt:desc or /tasks?sortBy=completed_asc
   public getTasks: RequestHandler = async (req, res, next) => {
+    const match = {} as IMatch;
+    const sort: any = {};
+
+    if (req.query.completed) match.completed = req.query.completed === "true";
+    if (req.query.sortBy) {
+      const splitted = (req.query.sortBy as string).split(":");
+      sort[splitted[0]] = splitted[1] === "desc" ? -1 : 1;
+    }
     try {
-      await req.user?.populate("tasks");
+      await req.user?.populate({
+        path: "tasks",
+        match,
+        options: {
+          limit: parseInt(req.query.limit as string),
+          skip: parseInt(req.query.skip as string),
+        },
+      });
       const tasks = req.user?.tasks as ITask[];
       if (tasks.length === 0)
         throw new AppError({
