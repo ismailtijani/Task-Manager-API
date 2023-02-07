@@ -4,6 +4,9 @@ import AppError from "../library/service";
 import { responseStatusCodes, IUser, IUserModel } from "../library/types";
 import User from "../models/user";
 
+interface IToken {
+  token: string;
+}
 class controller {
   public createUser: RequestHandler = async (req, res, next) => {
     try {
@@ -37,11 +40,34 @@ class controller {
         password: IUser["password"];
       };
       const user = await User.findByCredentials(email, password);
+      const token = await user.generateAuthToken();
 
-      res.status(200).json(user);
+      res.status(200).json({ user, token });
     } catch (error) {
       next(error);
     }
+  };
+
+  public userLogout: RequestHandler = async (req, res, next) => {
+    try {
+      const user = req.user!;
+      //Checking through the user tokens to filter out the one that was used for auth on the device
+      user.tokens = user.tokens.filter(
+        (token: any) => token.token !== req.token
+      );
+      await user.save();
+      res.status(200).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  //Logout from All devices
+  public userLogoutAll: RequestHandler = async (req, res, next) => {
+    const user = req.user!;
+    user.tokens = [];
+    await user.save();
+    res.status(200).send();
   };
 
   public readUser: RequestHandler = (req, res) => {
