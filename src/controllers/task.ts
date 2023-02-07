@@ -48,6 +48,7 @@ class Controller {
         options: {
           limit: parseInt(req.query.limit as string),
           skip: parseInt(req.query.skip as string),
+          sort,
         },
       });
       const tasks = req.user?.tasks as ITask[];
