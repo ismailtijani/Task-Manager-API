@@ -3,6 +3,7 @@ import userController from "../controllers/users";
 import validator from "../middleware/validator";
 import joiSchema from "../library/schema";
 import auth from "../middleware/auth";
+import upload from "../library/multer";
 
 class UserRoutes {
   public router: Router;
@@ -28,6 +29,18 @@ class UserRoutes {
     this.router.post("/logout", auth, userController.userLogout);
     this.router.post("/logoutall", auth, userController.userLogoutAll);
     this.router.delete("/delete", auth, userController.deleteUser);
+    this.router.post(
+      "/profile/avatar",
+      auth,
+      upload.single("avatar"),
+      userController.uploadAvatar
+    );
+    this.router.get("/profile/avatar", auth, userController.getAvatar);
+    this.router.delete(
+      "profile/avatar/delete",
+      auth,
+      userController.deleteAvatar
+    );
   }
 }
 
