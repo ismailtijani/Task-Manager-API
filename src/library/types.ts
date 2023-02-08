@@ -29,6 +29,7 @@ export interface IUser {
   email: string;
   age?: number;
   tokens: object[];
+  avatar: Buffer | undefined
 }
 
 export interface IUserModel extends IUser, Document {

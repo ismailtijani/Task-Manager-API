@@ -64,6 +64,7 @@ const userSchema = new Schema<IUser>(
         },
       },
     ],
+    avatar: Buffer,
   },
   { timestamps: true }
 );

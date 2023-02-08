@@ -3,6 +3,7 @@ import Logging from "../library/loggings";
 import AppError from "../library/service";
 import { responseStatusCodes, IUser, IUserModel } from "../library/types";
 import User from "../models/user";
+import sharp from "sharp";
 
 interface IToken {
   token: string;
@@ -98,6 +99,52 @@ class controller {
       });
       await user.save();
       res.status(200).send(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public uploadAvatar: RequestHandler = async (req, res, next) => {
+    try {
+      const user = req.user!;
+      const buffer = await sharp(req.file?.buffer)
+        .resize({
+          width: 250,
+          height: 300,
+        })
+        .png()
+        .toBuffer();
+
+      user.avatar = buffer;
+      await user.save();
+
+      res.status(200).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAvatar: RequestHandler = async (req, res, next) => {
+    try {
+      const user = req.user;
+      if (!user || !user.avatar)
+        throw new AppError({
+          message: "No avatar uploaded",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      res.set("Content-Type", "Image/png");
+      res.status(200).send(user.avatar);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public deleteAvatar: RequestHandler = async (req, res, next) => {
+    try {
+      const user = req.user!;
+      user.avatar = undefined
+      await user.save();
+      res.status(200).send();
     } catch (error) {
       next(error);
     }
