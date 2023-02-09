@@ -4,6 +4,7 @@ import validator from "validator";
 import AppError from "../library/service";
 import jwt from "jsonwebtoken";
 import Task from "./task";
+
 import {
   IUser,
   IUserModel,
@@ -11,6 +12,7 @@ import {
   LoginModel,
 } from "../library/types";
 import Logging from "../library/loggings";
+
 
 const userSchema = new Schema<IUser>(
   {
@@ -81,12 +83,22 @@ userSchema.methods.generateAuthToken = async function () {
   const user = this as IUserModel;
   const token = jwt.sign(
     { _id: user._id.toString() },
+   
     process.env.JWT_SECRET as string
   );
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;
 };
+
+//Removing sensitive datas from the user
+userSchema.methods.toJSON = function (){
+const user = this as IUserModel
+const userObject = user.toObject()
+delete userObject.password
+delete userObject.tokens
+return userObject
+}
 
 //Login User Authentication
 userSchema.statics.findByCredentials = async (

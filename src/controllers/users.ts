@@ -22,7 +22,7 @@ class controller {
       const user = await User.create(req.body);
       const token = await user.generateAuthToken();
 
-      Email.welcomeEmail(email, name);
+      // Email.welcomeEmail(email, name);
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "User created successfully",
@@ -151,7 +151,7 @@ class controller {
     const user = req.user!;
     try {
       await user.delete();
-      Email.cancelationEmail(user.name, user.email);
+      // Email.cancelationEmail(user.name, user.email);
       res.send(req.user);
     } catch (error) {
       next(error);

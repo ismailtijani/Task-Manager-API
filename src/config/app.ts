@@ -57,5 +57,5 @@ class App {
   }
 }
 
-export const PORT = Number(process.env.SERVER_PORT) || 3000;
+export const PORT = Number(process.env.SERVER_PORT) || 8000;
 export default new App().app;
