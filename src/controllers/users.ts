@@ -1,18 +1,17 @@
-import { Response, RequestHandler } from "express";
-import Logging from "../library/loggings";
+import { RequestHandler } from "express";
 import AppError from "../library/service";
 import { responseStatusCodes, IUser, IUserModel } from "../library/types";
 import User from "../models/user";
 import sharp from "sharp";
+import Email from "../emails/account";
 
-interface IToken {
-  token: string;
-}
 class controller {
   public createUser: RequestHandler = async (req, res, next) => {
+    const { email, name } = req.body as {
+      email: IUser["email"];
+      name: IUser["name"];
+    };
     try {
-      const email = (req.body as { email: IUser["email"] }).email;
-
       const existingUser = await User.findOne({ email });
       if (existingUser)
         throw new AppError({
@@ -23,6 +22,7 @@ class controller {
       const user = await User.create(req.body);
       const token = await user.generateAuthToken();
 
+      Email.welcomeEmail(email, name);
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "User created successfully",
@@ -108,10 +108,7 @@ class controller {
     try {
       const user = req.user!;
       const buffer = await sharp(req.file?.buffer)
-        .resize({
-          width: 250,
-          height: 300,
-        })
+        .resize(250, 300)
         .png()
         .toBuffer();
 
@@ -119,7 +116,7 @@ class controller {
       await user.save();
 
       res.status(200).send();
-    } catch (error) {
+    } catch (error: any) {
       next(error);
     }
   };
@@ -142,7 +139,7 @@ class controller {
   public deleteAvatar: RequestHandler = async (req, res, next) => {
     try {
       const user = req.user!;
-      user.avatar = undefined
+      user.avatar = undefined;
       await user.save();
       res.status(200).send();
     } catch (error) {
@@ -151,8 +148,10 @@ class controller {
   };
 
   public deleteUser: RequestHandler = async (req, res, next) => {
+    const user = req.user!;
     try {
-      await req.user?.delete();
+      await user.delete();
+      Email.cancelationEmail(user.name, user.email);
       res.send(req.user);
     } catch (error) {
       next(error);
