@@ -13,9 +13,8 @@ process.on("uncaughtException", (error: Error) => {
 });
 
 process.on("unhandledRejection", (err: Error, promise) => {
-  Logging.error(`Unhandled Rejection: ${err.message}`);
-  Logging.error(err.name);
-  Logging.error(err.stack);
+  Logging.error(`Unhandled Rejection: ${err}`);
+
   // close server
   server.close(() => process.exit(1));
 });

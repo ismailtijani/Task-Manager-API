@@ -1,4 +1,7 @@
 import sgMail from "@sendgrid/mail";
+import dotenv from "dotenv";
+
+dotenv.config(); // Had and error "API key does not start with "SG." without setting dotenv.config() in this file
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
