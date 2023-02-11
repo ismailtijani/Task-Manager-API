@@ -1,4 +1,4 @@
-import sgMail from "@sendgrid/mail";
+import sgMail, { MailDataRequired } from "@sendgrid/mail";
 import dotenv from "dotenv";
 import { NextFunction } from "express";
 import Logging from "../library/loggings";
@@ -12,7 +12,7 @@ export const welcomeEmail = async (
   name: string,
   next: NextFunction
 ) => {
-  const message = {
+  const message: MailDataRequired = {
     to: email,
     from: "princeismail095@gmail.com",
     subject: "Thanks for joining in!",
@@ -20,7 +20,8 @@ export const welcomeEmail = async (
   };
   try {
     Logging.info("Sending Welcome Email...");
-    await sgMail.send(message);
+    const res = await sgMail.send(message);
+    Logging.info(res);
   } catch (error: any) {
     if (error.response) {
       Logging.error(error.response.body);
@@ -34,14 +35,14 @@ export const cancelationEmail = async (
   name: string,
   next: NextFunction
 ) => {
-  const message = {
+  const message: MailDataRequired = {
     to: email,
     from: "princeismail095@gmail.com",
     subject: "Sorry to see you go!",
     text: `Goodbye ${name}. I hope to see you sometime soon`,
   };
   try {
-    Logging.info("Sending Welcome Email...");
+    Logging.info("Sending Goodbye Email...");
     await sgMail.send(message);
   } catch (error: any) {
     if (error.response) {
