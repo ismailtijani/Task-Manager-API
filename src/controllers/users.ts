@@ -3,7 +3,7 @@ import AppError from "../library/service";
 import { responseStatusCodes, IUser, IUserModel } from "../library/types";
 import User from "../models/user";
 import sharp from "sharp";
-import Email from "../emails/account";
+import { cancelationEmail, welcomeEmail } from "../emails/account";
 
 class controller {
   public createUser: RequestHandler = async (req, res, next) => {
@@ -22,7 +22,7 @@ class controller {
       const user = await User.create(req.body);
       const token = await user.generateAuthToken();
 
-      Email.welcomeEmail(email, name);
+      welcomeEmail(email, name, next); // Send Welcome Message to new user
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "User created successfully",
@@ -151,7 +151,7 @@ class controller {
     const user = req.user!;
     try {
       await user.delete();
-      Email.cancelationEmail(user.name, user.email);
+      cancelationEmail(user.name, user.email, next); // Send Goodbye message to exiting user
       res.send(req.user);
     } catch (error) {
       next(error);
