@@ -8,11 +8,9 @@ const server = http
 
 process.on("uncaughtException", (error: Error) => {
   Logging.warn(`Uncaught Exception: ${error.stack}`);
-
-  // errorHandler.handleError(error);
 });
 
-process.on("unhandledRejection", (err: Error, promise) => {
+process.on("unhandledRejection", (err: Error) => {
   Logging.error(`Unhandled Rejection: ${err}`);
 
   // close server

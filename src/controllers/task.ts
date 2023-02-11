@@ -1,19 +1,11 @@
 import { RequestHandler } from "express";
-import Logging from "../library/loggings";
-
 import AppError from "../library/service";
-import { ITask, IUserModel, responseStatusCodes } from "../library/types";
+import { ITask, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
-import User from "../models/user";
 
 interface IMatch {
   completed: boolean;
 }
-
-type ISort = {
-  createdAt?: string;
-  completed?: string;
-};
 
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {

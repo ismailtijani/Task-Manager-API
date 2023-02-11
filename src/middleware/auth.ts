@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import Logging from "../library/loggings";
 import AppError from "../library/service";
-import { IUser, IUserModel, responseStatusCodes } from "../library/types";
+import { IUserModel, responseStatusCodes } from "../library/types";
 import User from "../models/user";
 
 interface IDecode {
