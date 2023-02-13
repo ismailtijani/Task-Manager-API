@@ -4,6 +4,7 @@ import { responseStatusCodes, IUser, IUserModel } from "../library/types";
 import User from "../models/user";
 import sharp from "sharp";
 import { cancelationEmail, welcomeEmail } from "../emails/account";
+import sendEmail from "../emails/sendEmail";
 
 class controller {
   public createUser: RequestHandler = async (req, res, next) => {
@@ -22,7 +23,12 @@ class controller {
       const user = await User.create(req.body);
       const token = await user.generateAuthToken();
 
-      welcomeEmail(email, name, next); // Send Welcome Message to new user
+      // welcomeEmail(email, name, next); // Send Welcome Message to new user
+      await sendEmail({
+        email: email,
+        subject: "Thanks for joining in!",
+        message: `Welcome to SOT app, ${name}. Let me know how you get along with the app`,
+      });
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "User created successfully",
