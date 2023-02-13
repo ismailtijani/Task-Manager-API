@@ -9,11 +9,11 @@ interface IOptions {
 
 const sendEmail = (options: IOptions) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.sendgrid.net",
-    port: 587,
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
     auth: {
-      user: "apikey",
-      pass: process.env.SENDGRID_API_KEY,
+      user: "b6fece9aa9a3cb",
+      pass: "67fbea8b1e0381",
     },
   });
 
