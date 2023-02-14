@@ -1,6 +1,6 @@
-import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import Logging from "../library/loggings";
+import { server } from "../server";
 
 const mongoSetup = async () => {
   const mongoUrl = process.env.MONGODB_URL
@@ -14,9 +14,11 @@ const mongoSetup = async () => {
       w: "majority",
     });
     Logging.info("DB Connection Successful!");
-  } catch (error) {
-    Logging.error("Unable to Connect to Database:");
+    server()
+  } catch (error:any) {
+    Logging.error("Unable to Connect to Database, Server is not running")
     Logging.error(error);
+    process.exit(1)
   }
 };
 
