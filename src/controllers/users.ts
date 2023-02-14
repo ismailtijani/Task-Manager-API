@@ -24,7 +24,7 @@ class controller {
       const token = await user.generateAuthToken();
 
       // welcomeEmail(email, name, next); // Send Welcome Message to new user
-      await sendEmail({
+      sendEmail({
         email: email,
         subject: "Thanks for joining in!",
         message: `Welcome to SOT app, ${name}. Let me know how you get along with the app`,
@@ -157,7 +157,12 @@ class controller {
     const user = req.user!;
     try {
       await user.delete();
-      cancelationEmail(user.name, user.email, next); // Send Goodbye message to exiting user
+      // cancelationEmail(user.name, user.email, next); // Send Goodbye message to exiting user
+      sendEmail({
+        email: user.email,
+        subject: "Sorry to see you go!",
+        message: `Goodbye ${user.name}. I hope to see you sometime soon`,
+      });
       res.send(req.user);
     } catch (error) {
       next(error);

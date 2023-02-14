@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import smtpTransport from "nodemailer-smtp-transport";
+import Logging from "../library/loggings";
 
 interface IOptions {
   email: string;
@@ -9,27 +9,24 @@ interface IOptions {
 
 const sendEmail = (options: IOptions) => {
   const transporter = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
-    port: 2525,
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
     auth: {
-      user: "b6fece9aa9a3cb",
-      pass: "67fbea8b1e0381",
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: "princeismail095@gmail.com",
+    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
     to: options.email,
     subject: options.subject,
     text: options.message,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-    }
+    if (error) Logging.error(error);
+    Logging.info("Email sent: " + info.response);
   });
 };
 
