@@ -24,11 +24,16 @@ export class ErrorHandler {
   private handleCriticalError(error: Error, res?: Response) {
     Logging.error(error);
     if (res) {
+      res.status(responseStatusCodes.BAD_REQUEST).json({
+        STATUS: "FAILURE",
+        MESSAGE: { name: error.name, message: error.message },
+      });
       res.status(responseStatusCodes.INTERNAL_SERVER_ERROR).json({
+        STATUS: "FAILURE",
         MESSAGE: "Internal Server Error",
       });
+      process.exit(1);
     }
-    process.exit(1);
   }
 }
 

@@ -3,9 +3,11 @@ import http from "http";
 import Logging from "./library/loggings";
 
 export function server() {
- return http
-  .createServer(app)
-  .listen(PORT, () => Logging.info(`Express server listening on port ${PORT}`));
+  return http
+    .createServer(app)
+    .listen(PORT, () =>
+      Logging.info(`Express server listening on port ${PORT}`)
+    );
 }
 
 process.on("uncaughtException", (error: Error) => {
