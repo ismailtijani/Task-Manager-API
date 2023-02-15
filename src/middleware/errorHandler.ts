@@ -26,7 +26,7 @@ export class ErrorHandler {
     if (res) {
       res.status(responseStatusCodes.BAD_REQUEST).json({
         STATUS: "FAILURE",
-        MESSAGE: { name: error.name, message: error.message },
+        ERROR: { name: error.name, message: error.message },
       });
       res.status(responseStatusCodes.INTERNAL_SERVER_ERROR).json({
         STATUS: "FAILURE",
