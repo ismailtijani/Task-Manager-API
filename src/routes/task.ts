@@ -22,12 +22,7 @@ export class TaskRoutes {
       this.TaskController.createTask
     );
     this.router.get("/", auth, this.TaskController.getTasks);
-    this.router.get(
-      "/:id",
-      validator(joiSchema.findTaskById, "params"),
-      auth,
-      this.TaskController.getTaskById
-    );
+    this.router.get("/:id", auth, this.TaskController.getTaskById);
     this.router.patch(
       "/update/:id",
       validator(joiSchema.updateTask, "body"),

@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import AppError from "../library/service";
 import { ITask, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
+import validObjectId from "../middleware/validId";
 
 interface IMatch {
   completed: boolean;
@@ -61,10 +62,13 @@ class Controller {
 
   public getTaskById: RequestHandler = async (req, res, next) => {
     try {
-      const task = await Task.findOne({
-        _id: req.params.id,
-        owner: req.user?._id,
-      });
+      const id = req.params.id;
+      if (!validObjectId(id))
+        throw new AppError({
+          message: "Invalid Id",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const task = await Task.findOne({ id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Task does not exist",
@@ -97,10 +101,13 @@ class Controller {
         statusCode: responseStatusCodes.UNPROCESSABLE,
       });
     try {
-      const task: any = await Task.findById({
-        _id: req.params.id,
-        owner: req.user?._id,
-      });
+      const id = req.params.id;
+      if (!validObjectId(id))
+        throw new AppError({
+          message: "Invalid Id",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const task: any = await Task.findById({ id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Invalid Update",
@@ -116,10 +123,13 @@ class Controller {
   };
   public deleteTask: RequestHandler = async (req, res, next) => {
     try {
-      const task = await Task.findOneAndDelete({
-        _id: req.params.id,
-        owner: req.user?._id,
-      });
+      const id = req.params.id;
+      if (!validObjectId(id))
+        throw new AppError({
+          message: "Invalid Id",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const task = await Task.findOneAndDelete({ id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Invalid Request",
