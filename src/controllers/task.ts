@@ -85,22 +85,22 @@ class Controller {
     }
   };
   public updateTask: RequestHandler = async (req, res, next) => {
-    const updates = Object.keys(req.body);
-    if (updates.length === 0)
-      throw new AppError({
-        message: "Invalid Update",
-        statusCode: responseStatusCodes.BAD_REQUEST,
-      });
-    const allowedUpdated = ["task", "completed"];
-    const isValidOperation = updates.every((update) =>
-      allowedUpdated.includes(update)
-    );
-    if (!isValidOperation)
-      throw new AppError({
-        message: "Invalid Updates",
-        statusCode: responseStatusCodes.UNPROCESSABLE,
-      });
     try {
+      const updates = Object.keys(req.body);
+      if (updates.length === 0)
+        throw new AppError({
+          message: "Invalid Update",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const allowedUpdated = ["task", "completed"];
+      const isValidOperation = updates.every((update) =>
+        allowedUpdated.includes(update)
+      );
+      if (!isValidOperation)
+        throw new AppError({
+          message: "Invalid Updates",
+          statusCode: responseStatusCodes.UNPROCESSABLE,
+        });
       const _id = req.params.id;
       if (!validObjectId(_id))
         throw new AppError({

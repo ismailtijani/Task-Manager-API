@@ -37,7 +37,7 @@ class UserRoutes {
     );
     this.router.get("/profile/avatar", auth, userController.getAvatar);
     this.router.delete(
-      "profile/avatar/delete",
+      "/profile/avatar/delete",
       auth,
       userController.deleteAvatar
     );
