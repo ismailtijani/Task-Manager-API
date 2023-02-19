@@ -62,13 +62,13 @@ class Controller {
 
   public getTaskById: RequestHandler = async (req, res, next) => {
     try {
-      const id = req.params.id;
-      if (!validObjectId(id))
+      const _id = req.params.id;
+      if (!validObjectId(_id))
         throw new AppError({
           message: "Invalid Id",
           statusCode: responseStatusCodes.BAD_REQUEST,
         });
-      const task = await Task.findOne({ id, owner: req.user?._id });
+      const task = await Task.findOne({ _id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Task does not exist",
@@ -101,13 +101,13 @@ class Controller {
         statusCode: responseStatusCodes.UNPROCESSABLE,
       });
     try {
-      const id = req.params.id;
-      if (!validObjectId(id))
+      const _id = req.params.id;
+      if (!validObjectId(_id))
         throw new AppError({
           message: "Invalid Id",
           statusCode: responseStatusCodes.BAD_REQUEST,
         });
-      const task: any = await Task.findById({ id, owner: req.user?._id });
+      const task: any = await Task.findById({ _id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Invalid Update",
@@ -123,13 +123,13 @@ class Controller {
   };
   public deleteTask: RequestHandler = async (req, res, next) => {
     try {
-      const id = req.params.id;
-      if (!validObjectId(id))
+      const _id = req.params.id;
+      if (!validObjectId(_id))
         throw new AppError({
           message: "Invalid Id",
           statusCode: responseStatusCodes.BAD_REQUEST,
         });
-      const task = await Task.findOneAndDelete({ id, owner: req.user?._id });
+      const task = await Task.findOneAndDelete({ _id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Invalid Request",
