@@ -25,6 +25,7 @@ export class TaskRoutes {
       validator(joiSchema.findTaskById, "params"),
       this.TaskController.getTaskById
     );
+    this.router.patch("/update/:id", this.TaskController.updateTask);
   }
 }
 
