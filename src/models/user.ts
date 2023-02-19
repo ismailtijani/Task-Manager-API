@@ -1,15 +1,17 @@
 import bcrypt from "bcrypt";
-
 import { Schema, model } from "mongoose";
 import validator from "validator";
 import AppError from "../library/service";
 import jwt from "jsonwebtoken";
+import Task from "./task";
+
 import {
   IUser,
   IUserModel,
   responseStatusCodes,
   LoginModel,
 } from "../library/types";
+import Logging from "../library/loggings";
 
 const userSchema = new Schema<IUser>(
   {
@@ -21,8 +23,8 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: [true, "Password is required"],
       trim: true,
-      minlength: [7, "Password must be at least 7, got {VALUE}"],
-      validate(value: string) {
+      minlength: [8, "Password must be at least 8, got {VALUE}"],
+      validate: (value: string) => {
         if (value.toLowerCase().includes("password"))
           throw new AppError({
             message: "You can't use the word password",
@@ -63,20 +65,38 @@ const userSchema = new Schema<IUser>(
         },
       },
     ],
+    avatar: Buffer,
   },
   { timestamps: true }
 );
+
+// User and Task relationship (to enable populate)
+userSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
 
 // User Token Generation
 userSchema.methods.generateAuthToken = async function () {
   const user = this as IUserModel;
   const token = jwt.sign(
     { _id: user._id.toString() },
+
     process.env.JWT_SECRET as string
   );
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;
+};
+
+//Removing sensitive datas from the user
+userSchema.methods.toJSON = function () {
+  const user = this as IUserModel;
+  const userObject = user.toObject();
+  delete userObject.password;
+  delete userObject.tokens;
+  return userObject;
 };
 
 //Login User Authentication
@@ -105,6 +125,17 @@ userSchema.pre("save", async function (next) {
   if (user.isModified("password")) {
     user.password = await bcrypt.hash(user.password, 8);
   }
+  next();
+});
+
+//Deleting User's Task upon Deleting User Profile
+userSchema.pre<IUserModel>("remove", async function (next) {
+  const user = this;
+  // const user = this as unknown as IUserModel; // Why is 'this' having different type
+  await Task.deleteMany({ owner: user._id });
+  Logging.warn(
+    `All tasks created by ${user.name} has been deleted as the user deleted thier account`
+  );
   next();
 });
 

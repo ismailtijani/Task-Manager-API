@@ -17,6 +17,10 @@ const joiSchema = {
     completed: Joi.boolean().default(false),
   }),
   findTaskById: Joi.object({ id: Joi.string().trim().length(24).required() }),
+  updateTask: Joi.object({
+    task: Joi.string().trim(),
+    completed: Joi.boolean().default(false),
+  }),
 };
 
 export default joiSchema;

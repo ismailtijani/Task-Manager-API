@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import Logging from "../library/loggings";
 import AppError from "../library/service";
-import { IUser, IUserModel, responseStatusCodes } from "../library/types";
+import { IUserModel, responseStatusCodes } from "../library/types";
 import User from "../models/user";
 
 interface IDecode {
@@ -36,12 +35,8 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
     req.user = user;
 
     next();
-  } catch (error: any) {
-    Logging.error(error);
-    res.status(responseStatusCodes.UNAUTHORIZED).json({
-      STATUS: "FAILURE",
-      MESSAGE: error,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 

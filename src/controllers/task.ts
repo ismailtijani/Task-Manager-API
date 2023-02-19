@@ -1,18 +1,17 @@
 import { RequestHandler } from "express";
-import Logging from "../library/loggings";
 import AppError from "../library/service";
-import { responseStatusCodes } from "../library/types";
+import { ITask, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
+import validObjectId from "../middleware/validId";
+
+interface IMatch {
+  completed: boolean;
+}
 
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {
     try {
-      const { task, completed } = req.body as {
-        task: string;
-        completed: boolean | undefined;
-      };
-      Logging.info(completed);
-      const newTask = await Task.create({ task, completed });
+      const newTask = await Task.create({ ...req.body, owner: req.user?._id });
       res.status(201).json({
         STATUS: "SUCCESS",
         MESSAGE: "Task Created successfully",
@@ -23,10 +22,30 @@ class Controller {
     }
   };
 
+  //GET /tasks?completed=true
+  //GET /tasks?limit=2&skip=2
+  //GET /tasks?sortBy=createdAt:desc or /tasks?sortBy=completed_asc
   public getTasks: RequestHandler = async (req, res, next) => {
+    const match = {} as IMatch;
+    const sort: any = {};
+
+    if (req.query.completed) match.completed = req.query.completed === "true";
+    if (req.query.sortBy) {
+      const splitted = (req.query.sortBy as string).split(":");
+      sort[splitted[0]] = splitted[1] === "desc" ? -1 : 1;
+    }
     try {
-      const task = await Task.find({}); //Type for task
-      if (task.length === 0)
+      await req.user?.populate({
+        path: "tasks",
+        match,
+        options: {
+          limit: parseInt(req.query.limit as string),
+          skip: parseInt(req.query.skip as string),
+          sort,
+        },
+      });
+      const tasks = req.user?.tasks as ITask[];
+      if (tasks.length === 0)
         throw new AppError({
           message: "No task found",
           statusCode: responseStatusCodes.NOT_FOUND,
@@ -34,7 +53,7 @@ class Controller {
       res.status(200).json({
         STATUS: "SUCCESS",
         MASSAGE: "Task retrieved",
-        TASKS: task,
+        TASKS: tasks,
       });
     } catch (error) {
       next(error);
@@ -43,7 +62,13 @@ class Controller {
 
   public getTaskById: RequestHandler = async (req, res, next) => {
     try {
-      const task = await Task.findOne({ _id: req.params.id });
+      const id = req.params.id;
+      if (!validObjectId(id))
+        throw new AppError({
+          message: "Invalid Id",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const task = await Task.findOne({ id, owner: req.user?._id });
       if (!task)
         throw new AppError({
           message: "Task does not exist",
@@ -59,7 +84,7 @@ class Controller {
       next(error);
     }
   };
-  public updateTask: RequestHandler = async (req, res, next) => {
+ public updateTask: RequestHandler = async (req, res, next) => {
     try {
       const updates = Object.keys(req.body);
       if (updates.length === 0 || !req.user)
@@ -83,6 +108,26 @@ class Controller {
       });
 
       res.status(200).send(user);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public deleteTask: RequestHandler = async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      if (!validObjectId(id))
+        throw new AppError({
+          message: "Invalid Id",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      const task = await Task.findOneAndDelete({ id, owner: req.user?._id });
+      if (!task)
+        throw new AppError({
+          message: "Invalid Request",
+          statusCode: responseStatusCodes.BAD_REQUEST,
+        });
+      res.status(200).json(task);
     } catch (error) {
       next(error);
     }
