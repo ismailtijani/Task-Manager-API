@@ -3,10 +3,7 @@ import AppError from "../library/service";
 import { ITask, responseStatusCodes } from "../library/types";
 import Task from "../models/task";
 import validObjectId from "../middleware/validId";
-
-interface IMatch {
-  completed: boolean;
-}
+import { IMatch } from "../library/types";
 
 class Controller {
   public createTask: RequestHandler = async (req, res, next) => {

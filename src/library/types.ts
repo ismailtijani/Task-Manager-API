@@ -29,7 +29,7 @@ export interface IUser {
   email: string;
   age?: number;
   tokens: object[];
-  avatar: Buffer | undefined
+  avatar: Buffer | undefined;
 }
 
 export interface IUserModel extends IUser, Document {
@@ -55,4 +55,8 @@ export interface AppErrorArgs {
   message: string;
   statusCode: responseStatusCodes;
   isOperational?: boolean;
+}
+
+export interface IMatch {
+  completed: boolean;
 }
