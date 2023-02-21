@@ -14,7 +14,7 @@ class App {
   constructor() {
     this.app = express();
     this.config();
-    mongoSetup();
+    mongoSetup(express.response);
   }
 
   private config(): void {
