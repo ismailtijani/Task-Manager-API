@@ -15,24 +15,22 @@ export class TaskRoutes {
   }
 
   protected registerRoutes(): void {
+    this.router.use(auth);
     this.router.post(
       "/",
       validator(joiSchema.creatTask, "body"),
-      auth,
       this.TaskController.createTask
     );
-    this.router.get("/", auth, this.TaskController.getTasks);
-    this.router.get("/:id", auth, this.TaskController.getTaskById);
+    this.router.get("/", this.TaskController.getTasks);
+    this.router.get("/:id", this.TaskController.getTaskById);
     this.router.patch(
       "/update/:id",
       validator(joiSchema.updateTask, "body"),
-      auth,
       this.TaskController.updateTask
     );
     this.router.delete(
       "/delete/:id",
       validator(joiSchema.findTaskById, "params"),
-      auth,
       this.TaskController.deleteTask
     );
   }
