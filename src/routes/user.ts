@@ -24,23 +24,21 @@ class UserRoutes {
       validator(joiSchema.loginUser, "body"),
       userController.userLogin
     );
-    this.router.get("/profile", auth, userController.readUser);
-    this.router.patch("/update", auth, userController.updateUser);
-    this.router.post("/logout", auth, userController.userLogout);
-    this.router.post("/logoutall", auth, userController.userLogoutAll);
-    this.router.delete("/delete", auth, userController.deleteUser);
+
+    //Using a single line of code for the authetication middleware"
+    this.router.use(auth);
+    this.router.get("/profile", userController.readUser);
+    this.router.patch("/update", userController.updateUser);
+    this.router.post("/logout", userController.userLogout);
+    this.router.post("/logoutall", userController.userLogoutAll);
+    this.router.delete("/delete", userController.deleteUser);
     this.router.post(
       "/profile/avatar",
-      auth,
       upload.single("avatar"),
       userController.uploadAvatar
     );
-    this.router.get("/profile/avatar", auth, userController.getAvatar);
-    this.router.delete(
-      "/profile/avatar/delete",
-      auth,
-      userController.deleteAvatar
-    );
+    this.router.get("/profile/avatar", userController.getAvatar);
+    this.router.delete("/profile/avatar/delete", userController.deleteAvatar);
   }
 }
 
