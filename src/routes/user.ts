@@ -24,7 +24,6 @@ class UserRoutes {
       validator(joiSchema.loginUser, "body"),
       userController.userLogin
     );
-
     //Using a single line of code for the authetication middleware"
     this.router.use(auth);
     this.router.get("/profile", userController.readUser);
