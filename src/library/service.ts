@@ -51,13 +51,6 @@ export default class AppError extends Error {
 //     });
 //   }
 
-//   public static forbiddenResponse(message: string, res: Response) {
-//     res.status(responseStatusCodes.FORBIDDEN).json({
-//       STATUS: "FAILURE",
-//       MESSAGE: message,
-//     });
-//   }
-
 //   public static UnprocessableResponse(message: string, res: Response) {
 //     res.status(responseStatusCodes.UNPROCESSABLE).json({
 //       STATUS: "FAILURE",
