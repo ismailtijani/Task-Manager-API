@@ -51,13 +51,6 @@ export default class AppError extends Error {
 //     });
 //   }
 
-//   public static UnprocessableResponse(message: string, res: Response) {
-//     res.status(responseStatusCodes.UNPROCESSABLE).json({
-//       STATUS: "FAILURE",
-//       MESSAGE: message,
-//     });
-//   }
-
 //   public static insufficientParameters(res: Response) {
 //     res.status(responseStatusCodes.BAD_REQUEST).json({
 //       STATUS: "FAILURE",
