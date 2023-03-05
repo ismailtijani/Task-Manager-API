@@ -16,7 +16,4 @@ process.on("uncaughtException", (error: Error) => {
 
 process.on("unhandledRejection", (err: Error) => {
   Logging.error(`Unhandled Rejection: ${err}`);
-
-  // close server
-  server().close(() => process.exit(1));
 });
