@@ -17,23 +17,25 @@ export class ErrorHandler {
     }
   }
   private handleTrustedError = (error: AppError, res: Response) => {
-    return res
-      .status(error.statusCode)
-      .json({ STATUS: "FAILURE", MESSAGE: error.message });
+    return res.status(error.statusCode).json({
+      STATUS: "FAILURE",
+      MESSAGE: error.message,
+      STACK: process.env.NODE_ENV === "development" ? error.stack : {},
+    });
   };
   private handleCriticalError(error: Error, res?: Response) {
-    Logging.error(error);
     if (res) {
-      res.status(responseStatusCodes.BAD_REQUEST).json({
-        STATUS: "FAILURE",
-        ERROR: { name: error.name, message: error.message },
-      });
       res.status(responseStatusCodes.INTERNAL_SERVER_ERROR).json({
         STATUS: "FAILURE",
-        MESSAGE: "Internal Server Error",
+        ERROR: {
+          name: error.name,
+          message: "Internal Server Error",
+        },
       });
-      process.exit(1);
     }
+    Logging.error(error);
+    Logging.warn("Application encountered a critical error. Exiting.....");
+    process.exit(1);
   }
 }
 
